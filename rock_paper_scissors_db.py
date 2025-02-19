@@ -1,43 +1,34 @@
 
 #?<<<< MohsenPrd: Create DB and table >>>>#?
-import mysql.connector
+import sqlite3
 
-connect = mysql.connector.connect(host = 'localhost', user = 'root', password = '', database = '')
+connect = sqlite3.connect('rock_paper_scissors.db')
 myCursor = connect.cursor()
 
-try:
-    myCursor.execute("USE rock_paper_scissors_db")
-    
-except mysql.connector.Error as err:
+myCursor.execute('''CREATE TABLE IF NOT EXISTS semi_final (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    player1 TEXT,
+                    player2 TEXT,
+                    player1_choice TEXT,
+                    player2_choice TEXT,
+                    winner TEXT
+                    )''')
 
-    if err.errno == 1049:  # code that DB isnt exist
-        myCursor.execute("CREATE DATABASE rock_paper_scissors_db")
-        myCursor.execute("USE rock_paper_scissors_db")
-        myCursor.execute('''CREATE TABLE semi_final (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        player1 VARCHAR(255),
-                        player2 VARCHAR(255),
-                        player1_choice VARCHAR(255),
-                        player2_choice VARCHAR(255),
-                        winner VARCHAR(255)
-                        )''')
-        myCursor.execute('''CREATE TABLE final (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        player1 VARCHAR(255),
-                        player2 VARCHAR(255),
-                        player1_choice VARCHAR(255),
-                        player2_choice VARCHAR(255),
-                        winner VARCHAR(255)
-                        )''')
-    else:
-        print(f"Error: {err}")
-        exit()
+myCursor.execute('''CREATE TABLE IF NOT EXISTS final (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    player1 TEXT,
+                    player2 TEXT,
+                    player1_choice TEXT,
+                    player2_choice TEXT,
+                    winner TEXT
+                    )''')
 
+connect.commit()
 
 #?<<<< MohsenPrd: Function for save semi_final results to DB >>>>#?
 def save_semi_final(player1, player2, player1_choice, player2_choice, winner):
     
-    sql = "INSERT INTO semi_final (player1, player2, player1_choice, player2_choice, winner) VALUES (%s, %s, %s, %s, %s)"
+    sql = "INSERT INTO semi_final (player1, player2, player1_choice, player2_choice, winner) VALUES (?, ?, ?, ?, ?)"
     val = (player1, player2, player1_choice, player2_choice, winner)
     myCursor.execute(sql, val)
     connect.commit()
@@ -45,7 +36,7 @@ def save_semi_final(player1, player2, player1_choice, player2_choice, winner):
 #?<<<< MohsenPrd: Function for save final results to DB >>>>#?
 def save_final(player1, player2, player1_choice, player2_choice, winner):
     
-    sql = "INSERT INTO final (player1, player2, player1_choice, player2_choice, winner) VALUES (%s, %s, %s, %s, %s)"
+    sql = "INSERT INTO final (player1, player2, player1_choice, player2_choice, winner) VALUES (?, ?, ?, ?, ?)"
     val = (player1, player2, player1_choice, player2_choice, winner)
     myCursor.execute(sql, val)
     connect.commit()
